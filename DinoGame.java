@@ -1,6 +1,9 @@
 import javax.swing.*;
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -26,11 +29,14 @@ public class DinoGame extends JPanel implements ActionListener, MouseListener {
     private int obstacleInterval = 90;
     private int birdTimer = 0;
     private int birdInterval = 140;
+    private BufferedImage dinoImage;
+    private String dinoImagePath = "dino.png";
 
     public DinoGame() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.white);
         addMouseListener(this);
+        loadDinoImage();
         timer = new Timer(16, this);
         timer.start();
     }
@@ -66,11 +72,15 @@ public class DinoGame extends JPanel implements ActionListener, MouseListener {
         g2.setColor(nightMode ? new Color(56, 60, 65) : new Color(48, 42, 36));
         g2.fillRect(0, GROUND_Y + DINO_SIZE / 2, WIDTH, HEIGHT - GROUND_Y - DINO_SIZE / 2);
 
-        g2.setColor(nightMode ? Color.white : new Color(80, 80, 80));
-        g2.fillRect(50, dinoY, DINO_SIZE, DINO_SIZE);
-        g2.setColor(nightMode ? Color.black : Color.black);
-        g2.fillOval(58, dinoY + 10, 10, 10);
-        g2.drawLine(55, dinoY + 30, 70, dinoY + 30);
+        if (dinoImage != null) {
+            g2.drawImage(dinoImage, 50, dinoY, DINO_SIZE, DINO_SIZE, this);
+        } else {
+            g2.setColor(nightMode ? Color.white : new Color(80, 80, 80));
+            g2.fillRect(50, dinoY, DINO_SIZE, DINO_SIZE);
+            g2.setColor(nightMode ? Color.black : Color.black);
+            g2.fillOval(58, dinoY + 10, 10, 10);
+            g2.drawLine(55, dinoY + 30, 70, dinoY + 30);
+        }
 
         g2.setColor(new Color(34, 139, 34));
         for (Rectangle obs : obstacles) {
@@ -211,6 +221,24 @@ public class DinoGame extends JPanel implements ActionListener, MouseListener {
         birdTimer = 0;
         birdInterval = 140;
         timer.start();
+    }
+
+    private void loadDinoImage() {
+        try {
+            File imageFile = new File(dinoImagePath);
+            if (imageFile.exists()) {
+                dinoImage = ImageIO.read(imageFile);
+            }
+        } catch (Exception e) {
+            System.err.println("Gagal memuat gambar: " + e.getMessage());
+            dinoImage = null;
+        }
+    }
+
+    public void changeDinoImage(String newImagePath) {
+        dinoImagePath = newImagePath;
+        loadDinoImage();
+        repaint();
     }
 
     @Override
