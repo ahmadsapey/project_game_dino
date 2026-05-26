@@ -1,0 +1,3 @@
+# Ensure .java files are not ignored by the build/system
+include:
+  - DinoGame.java
